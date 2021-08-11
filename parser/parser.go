@@ -28,9 +28,12 @@ func New(in *os.File) *Parser {
 	return &Parser{in, scanner}
 }
 
+func (p *Parser) HasMoreLines() bool {
+	return p.scanner.Scan()
+}
+
 func (p *Parser) Advance() {
-	has_more_lines := p.scanner.Scan()
-	if !has_more_lines {
+	if !p.HasMoreLines() {
 		panic("No more lines")
 	}
 }
