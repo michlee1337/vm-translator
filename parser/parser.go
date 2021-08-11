@@ -8,14 +8,18 @@ import (
 	"os"
 )
 
-// type Parserer interface {
-// 	New(*os.File )
-// 	HasMoreCommands()
-// 	Advance()
-// 	CommandType()
-// 	Arg1()
-// 	Arg2()
-// }
+type CommandType int
+
+const (
+	Arithmetic CommandType = iota
+  Push
+  Pop
+  // Goto  // TODO: Support these command types
+	// If
+	// Function
+	// Return
+	// Call
+)
 
 type Parser struct {
 	in    *os.File
@@ -41,3 +45,9 @@ func (p *Parser) Advance() {
 func (p *Parser) CurLine() (string) {
 	return p.scanner.Text()
 }
+
+func (p *Parser) CommandType() (CommandType) {}
+
+func (p *Parser) Arg1() (string) {}
+
+func (p *Parser) Arg2() (string) {}
