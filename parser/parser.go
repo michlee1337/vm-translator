@@ -6,19 +6,20 @@ import (
 	// "io"
 	// "io/ioutil"
 	"os"
+	"strings"
 )
 
 type CommandType int
 
 const (
-	Arithmetic CommandType = iota
-  Push
-  Pop
-  // Goto  // TODO: Support these command types
-	// If
-	// Function
-	// Return
-	// Call
+	CArithmetic CommandType = iota
+  CPush
+  CPop
+  // CGoto  // TODO: Support these command types
+	// CIf
+	// CFunction
+	// CReturn
+	// CCall
 )
 
 type Parser struct {
@@ -46,7 +47,16 @@ func (p *Parser) CurLine() (string) {
 	return p.scanner.Text()
 }
 
-func (p *Parser) CommandType() (CommandType) {}
+func (p *Parser) CommandType() (CommandType) {
+	first_word := strings.Fields(p.CurLine())[0]
+	if first_word == "push" {
+		return CPush
+	} else if first_word == "pop" {
+		return CPop
+	} else {  // TODO: Handle other commands
+		return CArithmetic
+	}
+}
 
 func (p *Parser) Arg1() (string) {}
 
