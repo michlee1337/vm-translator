@@ -25,26 +25,29 @@ const (
 type Parser struct {
 	in    *os.File
 	scanner *bufio.Scanner
+	cur_line string
 }
 
 func New(in *os.File) *Parser {
 	reader := bufio.NewReader(in)
 	scanner := bufio.NewScanner(reader)
-	return &Parser{in, scanner}
+	return &Parser{in, scanner, ""}
 }
 
-func (p *Parser) HasMoreLines() bool {
-	return p.scanner.Scan()
-}
-
-func (p *Parser) Advance() {
-	if !p.HasMoreLines() {
-		panic("No more lines")
+func (p *Parser) Advance() bool {
+	// Returns false if no more lines
+	for p.scanner.Scan() {
+		p.cur_line = p.scanner.Text()
+		strings.TrimSpace(p.cur_line)
+    if p.IsCommand() {
+			return true
+		}
 	}
+	return false
 }
 
 func (p *Parser) CurLine() (string) {
-	return p.scanner.Text()
+	return p.cur_line
 }
 
 func (p *Parser) CommandType() (CommandType) {
@@ -60,4 +63,6 @@ func (p *Parser) CommandType() (CommandType) {
 
 func (p *Parser) Arg1() (string) {}
 
-func (p *Parser) Arg2() (string) {}
+func (p *Parser) IsCommand() bool {
+	return len(p.cur_line) > 1 && p.cur_line[:1] != "//"
+}
