@@ -14,7 +14,6 @@ const pop_into_D = 	"@SP\n" +			// move to top-most of stack
 const decrement_SP = 	"@SP\n" +
 											"M=M-1"
 
-
 // stores segment pointers for writePushPop
 // static segment is handled seperately
 var segment_ptr = map[string]string{
@@ -26,6 +25,11 @@ var segment_ptr = map[string]string{
 	"temp"			: "5",
 	"pointer"		: "3"}
 
+var false_condition = map[string]string{
+	"GT": "JLE",
+	"LT": "JGE",
+	"EQ": "JNE"}
+		
 // track number of generated labels to ensure uniqueness
 var label_count = map[string]int{
 	"GT": 0,
@@ -91,29 +95,14 @@ func (c *Coder) WriteArithmetic(op string) string{
 							"M=M-D\n" +
 							decrement_SP
 		case "gt":
-			jump_label := fmt.Sprintf("NOT_GT%d", label_count["GT"])
-
-			return pop_into_D +
-						"D=M-D\n" + // D = second topmost (v1) - topmost (v2)
-
-						"@SP\n" +  // goto store location
-						"A=M\n" +
-
-						"@" + jump_label + "\n" +  // jump if v1 gt v2 is false
-						"D; JLE\n" +
-
-						"M=-1\n" +  // if gt
-						"@END\n" +
-						"0; JMP\n" +
-
-						"(" + jump_label + ")\n" +  // if not gt
-						"M=0\n" +
-
-						"(END)\n" +
-						"@END\n" +
-						"0; JMP\n"
-		// case "lt":
-		// case "eq":
+			return 	pop_into_D +
+							c.ComparisonBranch("gt")
+		case "lt":
+			return 	pop_into_D +
+							c.ComparisonBranch("lt")
+		case "eq":
+			return 	pop_into_D +
+							c.ComparisonBranch("eq")
 		// case "neg":
 		// case "and":
 		// case "or":
@@ -133,3 +122,25 @@ func (c *Coder) GetSegment(segment string, addr string) string {
 					"@" + addr + "\n" +
 					"A=D+A\n"
 }
+
+func (c *Coder) ComparisonBranch(comparator string) string {
+	jump_label := fmt.Sprintf("NOT_%v%d", comparator, label_count[comparator])
+	jump_cond := false_condition[comparator]
+	return	"D=M-D\n" + // D = second topmost (v1) - topmost (v2)
+					"@SP\n" +  // goto store location
+					"A=M\n" +
+
+					"@" + jump_label + "\n" +  // jump if v1 gt v2 is false
+					"D;" + jump_cond +"\n" +
+
+					"M=-1\n" +  // if gt
+					"@END\n" +
+					"0; JMP\n" +
+
+					"(" + jump_label + ")\n" +  // if not gt
+					"M=0\n" +
+
+					"(END)\n" +
+					"@END\n" +
+					"0; JMP\n"
+} 
