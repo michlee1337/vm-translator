@@ -65,6 +65,10 @@ func (c *Coder) WritePop(segment string, addr string) string {
 	return sb.String()
 }
 
+func (c *Coder) WriteArithmetic() string{
+	return ""
+}
+
 func (c *Coder) GetSegment(segment string, addr string) string {
 	// handle static as special case
 	if segment == "static" {
