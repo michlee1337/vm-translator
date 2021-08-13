@@ -43,6 +43,28 @@ func (c *Coder) WritePush(segment string, addr string) string {
 	return sb.String()
 }
 
+func (c *Coder) WritePop(segment string, addr string) string {
+	var sb strings.Builder
+
+	// get stack
+	sb.WriteString(
+		"@SP\n" +
+		"A=M\n" +
+		"D=M\n")
+
+	// move from stack to segment
+	sb.WriteString(c.GetSegment(segment, addr))
+	sb.WriteString(
+		"M=D\n")
+
+	// update stack pointer
+	sb.WriteString(
+		"@SP\n" +
+		"M=M-1\n")
+
+	return sb.String()
+}
+
 func (c *Coder) GetSegment(segment string, addr string) string {
 	// handle static as special case
 	if segment == "static" {
