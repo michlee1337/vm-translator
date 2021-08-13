@@ -2,11 +2,10 @@ package parser
 
 import (
 	"bufio"
-	// "fmt"
-	// "io"
-	// "io/ioutil"
+	"fmt"
 	"os"
 	"strings"
+	"errors"
 )
 
 type CommandType int
