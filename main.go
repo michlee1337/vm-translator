@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/michlee1337/vm-translator/parser"
 	"os"
+	"strings"
+	"github.com/michlee1337/vm-translator/parser"
+	"github.com/michlee1337/vm-translator/coder"
 )
 
 func main() {
