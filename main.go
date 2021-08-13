@@ -17,7 +17,28 @@ func main() {
 	if err != nil {
 		panic("failed to open file")
 	}
-	parser := parser.New(infile)
-	parser.Advance()
-	fmt.Println(parser.CurLine())
+
+	file_name := os.Args[1][:strings.Index(os.Args[1], ".")]
+	outfile, err := os.Create(fmt.Sprintf("%v.asm", file_name))
+	if err != nil {
+		panic("failed to create file")
+	}
+	defer outfile.Close()
+
+	p := parser.New(infile)
+	c := coder.New(file_name)
+
+	for p.Advance() {
+		switch p.CommandType() {
+			case parser.CPush:
+				arg1, _ := p.Arg1()
+				arg2, _ := p.Arg2()
+				outfile.WriteString(c.WritePush(arg1, arg2))
+			case parser.CPop:
+				arg1, _ := p.Arg1()
+				arg2, _ := p.Arg2()
+				outfile.WriteString(c.WritePop(arg1, arg2))
+
+		}
+	}
 }
