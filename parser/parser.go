@@ -60,7 +60,34 @@ func (p *Parser) CommandType() (CommandType) {
 	}
 }
 
-func (p *Parser) Arg1() (string) {}
+func (p *Parser) Arg1() (string, error) {
+	if p.cur_line == "" {
+		return "", errors.New("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
+	}
+	cmd_type := p.CommandType()
+	if cmd_type == CReturn {
+		return "", errors.New("Commands of type Return has no arguments")
+	}
+	if cmd_type == CArithmetic {
+		return strings.Fields(p.cur_line)[0], nil
+	}
+	return strings.Fields(p.cur_line)[1], nil
+}
+
+func (p *Parser) Arg2() (string, error) {
+	if p.cur_line == "" {
+		return "", errors.New("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
+	}
+	cmd_type := p.CommandType()
+
+	if cmd_type != CPush &&
+			cmd_type != CPop &&
+			cmd_type != CFunction &&
+			cmd_type != CCall {
+		return "", fmt.Errorf("Command of type %v has no second argument.", cmd_type)
+	}
+	return strings.Fields(p.cur_line)[2], nil
+}
 
 func (p *Parser) IsCommand() bool {
 	return len(p.cur_line) > 1 && p.cur_line[:1] != "//"
