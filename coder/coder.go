@@ -24,6 +24,25 @@ func New(file_name string) *Coder {
 	return &Coder{file_name}
 }
 
+func (c *Coder) WritePush(segment string, addr string) string {
+	var sb strings.Builder
+
+	sb.WriteString(c.GetSegment(segment, addr))
+
+	// move from segment to stack
+	sb.WriteString(
+		"D=M\n" +
+		"@SP\n" +
+		"M=D\n")
+
+	// update stack pointer
+	sb.WriteString(
+		"@SP\n" +
+		"M=M+1\n")
+
+	return sb.String()
+}
+
 func (c *Coder) GetSegment(segment string, addr string) string {
 	// handle static as special case
 	if segment == "static" {
