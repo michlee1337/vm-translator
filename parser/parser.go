@@ -14,11 +14,11 @@ const (
 	CArithmetic CommandType = iota
   CPush
   CPop
-  // CGoto  // TODO: Support these command types
-	// CIf
-	// CFunction
-	// CReturn
-	// CCall
+  CGoto
+	CIf
+	CFunction
+	CReturn
+	CCall
 )
 
 type Parser struct {
