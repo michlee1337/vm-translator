@@ -50,7 +50,7 @@ func (p *Parser) CurLine() (string) {
 }
 
 func (p *Parser) CommandType() (CommandType) {
-	first_word := strings.Fields(p.CurLine())[0]
+	first_word := strings.Fields(p.cur_line)[0]
 	if first_word == "push" {
 		return CPush
 	} else if first_word == "pop" {
