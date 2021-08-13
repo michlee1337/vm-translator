@@ -23,3 +23,15 @@ type Coder struct {
 func New(file_name string) *Coder {
 	return &Coder{file_name}
 }
+
+func (c *Coder) GetSegment(segment string, addr string) string {
+	// handle static as special case
+	if segment == "static" {
+		return fmt.Sprintf("@%v.%v\n", c.file_name, addr)
+	}
+
+	return "@" + segment_ptr[segment] + "\n" +
+					"D=A\n" +
+					"@" + addr + "\n" +
+					"A=D+A\n"
+}
