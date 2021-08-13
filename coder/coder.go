@@ -5,6 +5,16 @@ import (
 	"strings"
 )
 
+// command sequences that are commonly used in arithmetic operations
+const pop_into_D = 	"@SP\n" +			// move to top-most of stack
+										"A=M-1\n" +
+										"D=M\n" + 	 	// store val in D
+										"A=A-1\n"   	// move to second top-most
+
+const decrement_SP = 	"@SP\n" +
+											"M=M-1"
+
+
 // stores segment pointers for writePushPop
 // static segment is handled seperately
 var segment_ptr = map[string]string{
@@ -16,6 +26,12 @@ var segment_ptr = map[string]string{
 	"temp"			: "5",
 	"pointer"		: "3"}
 
+// track number of generated labels to ensure uniqueness
+var label_count = map[string]int{
+	"GT": 0,
+	"LT": 0,
+	"EQ": 0}
+
 type Coder struct {
 	file_name string
 }
@@ -26,7 +42,6 @@ func New(file_name string) *Coder {
 
 func (c *Coder) WritePush(segment string, addr string) string {
 	var sb strings.Builder
-
 	sb.WriteString(c.GetSegment(segment, addr))
 
 	// move from segment to stack
@@ -65,7 +80,45 @@ func (c *Coder) WritePop(segment string, addr string) string {
 	return sb.String()
 }
 
-func (c *Coder) WriteArithmetic() string{
+func (c *Coder) WriteArithmetic(op string) string{
+	switch op {
+		case "add":
+			return 	pop_into_D +
+							"M=M+D\n" +
+							decrement_SP
+		case "sub":
+			return 	pop_into_D +
+							"M=M-D\n" +
+							decrement_SP
+		case "gt":
+			jump_label := fmt.Sprintf("NOT_GT%d", label_count["GT"])
+
+			return pop_into_D +
+						"D=M-D\n" + // D = second topmost (v1) - topmost (v2)
+
+						"@SP\n" +  // goto store location
+						"A=M\n" +
+
+						"@" + jump_label + "\n" +  // jump if v1 gt v2 is false
+						"D; JLE\n" +
+
+						"M=-1\n" +  // if gt
+						"@END\n" +
+						"0; JMP\n" +
+
+						"(" + jump_label + ")\n" +  // if not gt
+						"M=0\n" +
+
+						"(END)\n" +
+						"@END\n" +
+						"0; JMP\n"
+		// case "lt":
+		// case "eq":
+		// case "neg":
+		// case "and":
+		// case "or":
+		// case "not":
+	}
 	return ""
 }
 

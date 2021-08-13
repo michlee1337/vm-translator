@@ -38,6 +38,9 @@ func main() {
 				arg1, _ := p.Arg1()
 				arg2, _ := p.Arg2()
 				outfile.WriteString(c.WritePop(arg1, arg2))
+			case parser.CArithmetic:
+				arg1, _ := p.Arg1()
+				outfile.WriteString(c.WriteArithmetic(arg1));
 
 		}
 	}
