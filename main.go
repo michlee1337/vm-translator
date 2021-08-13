@@ -9,8 +9,11 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello")
-	infile, err := os.Open(".gitignore")
+	if len(os.Args) < 2 {
+		panic("vm translator should be called with an argument as follows: vm-translator [file-to-translate.asm]")
+	}
+
+	infile, err := os.Open(os.Args[1])
 	if err != nil {
 		panic("failed to open file")
 	}
