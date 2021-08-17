@@ -11,8 +11,8 @@ import (
 	"errors"
 )
 
+// Command Types in VM Language
 type CommandType int
-
 const (
 	CArithmetic CommandType = iota
   CPush
@@ -24,6 +24,9 @@ const (
 	CCall
 )
 
+// Parser tracks the current line of vm file being processed,
+// parses the types and arguments of the current command,
+// and advances to the next command.
 type Parser struct {
 	scanner *bufio.Scanner
 	cur_line string
