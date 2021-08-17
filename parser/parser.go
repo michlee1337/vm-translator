@@ -1,6 +1,6 @@
-// Package parser implements functions for parsing commands in the VM Language
+// Package parser implements functions for parsing 
+// commands in the VM Language,
 // and an iota of command types in the VM Language.
-
 package parser
 
 import (
