@@ -116,7 +116,8 @@ func (c *Coder) WriteArithmetic(op string) string{
 	return ""
 }
 
-func (c *Coder) GetSegment(segment string, addr string) string {
+// Moves memory pointer to the specified segment address
+func (c *Coder) getSegment(segment string, addr string) string {
 	// handle static as special case
 	if segment == "static" {
 		return fmt.Sprintf("@%v.%v\n", c.file_name, addr)
@@ -128,24 +129,27 @@ func (c *Coder) GetSegment(segment string, addr string) string {
 					"A=D+A\n"
 }
 
-func (c *Coder) ComparisonBranch(comparator string) string {
-	jump_label := fmt.Sprintf("NOT_%v%d", comparator, label_count[comparator])
-	jump_cond := false_condition[comparator]
-	return	"D=M-D\n" + // D = second topmost (v1) - topmost (v2)
-					"@SP\n" +  // goto store location
-					"A=M\n" +
+// Writes boolean result of comparison to the stack
+// true is respresented as -1 (0b111...111), false as 0 (0b000...000)
+func (c *Coder) writeCompResultToStack(comparator string) string {
+	label := fmt.Sprintf("NOT_%v%d", comparator, label_count[comparator])
+	cond := cmp_false[comparator]
+	return	"D=M-D\n" + 					// D = second topmost val - topmost val
+					"@SP\n" +  						
+					"M=M+1" + 						// preemptively increment stack pointer 
+					"A=M-1\n" +							// goto top of stack
 
-					"@" + jump_label + "\n" +  // jump if v1 gt v2 is false
-					"D;" + jump_cond +"\n" +
+					"@" + label + "\n" +  // jump if comparator result is false
+					"D;" + cond +"\n" +
 
-					"M=-1\n" +  // if gt
+					"M=-1\n" +  // if true, write -1 and end
 					"@END\n" +
 					"0; JMP\n" +
 
-					"(" + jump_label + ")\n" +  // if not gt
+					"(" + label + ")\n" +  // if false, write 0 and end
 					"M=0\n" +
 
-					"(END)\n" +
+					"(END)\n" +  // loop infinitely
 					"@END\n" +
 					"0; JMP\n"
 } 
