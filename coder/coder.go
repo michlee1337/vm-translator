@@ -1,3 +1,5 @@
+// Package coder implements functions for translating
+// commands in VM language to Assembly language.
 package coder
 
 import (
@@ -17,12 +19,18 @@ var segment_ptr = map[string]string{
 	"temp"			: "5",
 	"pointer"		: "3"}
 
-var false_condition = map[string]string{
-	"GT": "JLE",
-	"LT": "JGE",
-	"EQ": "JNE"}
+// Map of VM comparators to their negated Assembly jump commands.
+// This is used to implement branching to translate comparator 
+// arithmetic commands.
+var cmp_false = map[string]string{
+	"GT": "JLE",  // greater than == not less than or equal to
+	"LT": "JGE",  // less than == not greater than or equal to
+	"EQ": "JNE"}  // equal == not not equal
 		
-// track number of generated labels to ensure uniqueness
+// Map of number of times this particular VM comparator has
+// appeared in the current instream being translated.
+// This is used to create unique branch labels to translate
+// comparator arithmetic commands.
 var label_count = map[string]int{
 	"GT": 0,
 	"LT": 0,
@@ -42,24 +50,27 @@ const decrement_SP = 	"@SP\n" +
 
 // Coder implements translation from VM Language to Assembly Language.
 type Coder struct {
-	file_name string
+	file_name string  // necessary for handling static segment commands
 }
 
 func New(file_name string) *Coder {
 	return &Coder{file_name}
 }
 
+// Translates commands of type CPush
 func (c *Coder) WritePush(segment string, addr string) string {
 	var sb strings.Builder
-	sb.WriteString(c.GetSegment(segment, addr))
 
-	// move from segment to stack
+	// move to segment
+	sb.WriteString(c.getSegment(segment, addr))
+
+	// copy value from segment into stack
 	sb.WriteString(
 		"D=M\n" +
 		"@SP\n" +
 		"M=D\n")
 
-	// update stack pointer
+	// increment stack pointer
 	sb.WriteString(
 		"@SP\n" +
 		"M=M+1\n")
@@ -67,21 +78,24 @@ func (c *Coder) WritePush(segment string, addr string) string {
 	return sb.String()
 }
 
+// Translates commands of type CPop
 func (c *Coder) WritePop(segment string, addr string) string {
 	var sb strings.Builder
 
-	// get stack
+	// move to stack and store data
 	sb.WriteString(
 		"@SP\n" +
 		"A=M\n" +
 		"D=M\n")
 
-	// move from stack to segment
-	sb.WriteString(c.GetSegment(segment, addr))
+	// move to segment
+	sb.WriteString(c.getSegment(segment, addr))
+
+	// copy data into segment
 	sb.WriteString(
 		"M=D\n")
 
-	// update stack pointer
+	// decrement stack pointer
 	sb.WriteString(
 		"@SP\n" +
 		"M=M-1\n")
