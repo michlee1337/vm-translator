@@ -26,14 +26,17 @@ type Parser struct {
 	cur_line string
 }
 
+// Initializes new Parser struct with
+// a bufio.Scanner for the instream
 func New(in *os.File) *Parser {
 	reader := bufio.NewReader(in)
 	scanner := bufio.NewScanner(reader)
-	return &Parser{in, scanner, ""}
+	return &Parser{scanner, ""}
 }
 
+// Sets Parser.cur_line to the next command and returns true.
+// If no more commands, reryrbs false.
 func (p *Parser) Advance() bool {
-	// Returns false if no more lines
 	for p.scanner.Scan() {
 		p.cur_line = p.scanner.Text()
 		strings.TrimSpace(p.cur_line)
@@ -48,6 +51,7 @@ func (p *Parser) CurLine() (string) {
 	return p.cur_line
 }
 
+// Returns an iota representing the type of VM command.
 func (p *Parser) CommandType() (CommandType) {
 	first_word := strings.Fields(p.cur_line)[0]
 	if first_word == "push" {
@@ -59,6 +63,8 @@ func (p *Parser) CommandType() (CommandType) {
 	}
 }
 
+// Returns the first argument of the current command.
+// If no such argument exists, returns error.
 func (p *Parser) Arg1() (string, error) {
 	if p.cur_line == "" {
 		return "", errors.New("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
@@ -73,6 +79,9 @@ func (p *Parser) Arg1() (string, error) {
 	return strings.Fields(p.cur_line)[1], nil
 }
 
+
+// Returns the second argument of the current command.
+// If no such argument exists, returns error.
 func (p *Parser) Arg2() (string, error) {
 	if p.cur_line == "" {
 		return "", errors.New("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
@@ -88,6 +97,7 @@ func (p *Parser) Arg2() (string, error) {
 	return strings.Fields(p.cur_line)[2], nil
 }
 
+// Returns true if the current command is not whitespace and not a comment.
 func (p *Parser) IsCommand() bool {
 	return len(p.cur_line) > 1 && p.cur_line[:1] != "//"
 }
