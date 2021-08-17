@@ -5,17 +5,9 @@ import (
 	"strings"
 )
 
-// command sequences that are commonly used in arithmetic operations
-const pop_into_D = 	"@SP\n" +			// move to top-most of stack
-										"A=M-1\n" +
-										"D=M\n" + 	 	// store val in D
-										"A=A-1\n"   	// move to second top-most
-
-const decrement_SP = 	"@SP\n" +
-											"M=M-1"
-
-// stores segment pointers for writePushPop
-// static segment is handled seperately
+// Map of segment pointers for the Hack machine spec.
+// The static segment is handled in WritePushPop()
+// as a special case as there is no fixed pointer.
 var segment_ptr = map[string]string{
 	"local"			: "LCL",
 	"argument"	: "ARG",
@@ -36,6 +28,19 @@ var label_count = map[string]int{
 	"LT": 0,
 	"EQ": 0}
 
+// Common sub-operation in arithmetic commands
+const goto_topmost_stack_val = 	"@SP\n" +
+															"A=M-1\n"
+
+// Common sub-operation in arithmetic commands
+const pop_into_D = 	"D=M\n" + 	 	// store val in D
+										"A=A-1\n"   	// move to second top-most
+
+// Common sub-operation in arithmetic commands
+const decrement_SP = 	"@SP\n" +
+											"M=M-1"
+
+// Coder implements translation from VM Language to Assembly Language.
 type Coder struct {
 	file_name string
 }
