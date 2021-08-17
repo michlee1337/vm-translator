@@ -40,7 +40,7 @@ func (p *Parser) Advance() bool {
 	for p.scanner.Scan() {
 		p.cur_line = p.scanner.Text()
 		strings.TrimSpace(p.cur_line)
-    if p.IsCommand() {
+    if p.isCommand() {
 			return true
 		}
 	}
@@ -98,6 +98,6 @@ func (p *Parser) Arg2() (string, error) {
 }
 
 // Returns true if the current command is not whitespace and not a comment.
-func (p *Parser) IsCommand() bool {
+func (p *Parser) isCommand() bool {
 	return len(p.cur_line) > 1 && p.cur_line[:1] != "//"
 }
