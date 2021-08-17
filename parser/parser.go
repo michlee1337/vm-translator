@@ -22,7 +22,6 @@ const (
 )
 
 type Parser struct {
-	in    *os.File
 	scanner *bufio.Scanner
 	cur_line string
 }
