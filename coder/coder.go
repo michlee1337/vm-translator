@@ -89,31 +89,49 @@ func (c *Coder) WritePop(segment string, addr string) string {
 	return sb.String()
 }
 
-func (c *Coder) WriteArithmetic(op string) string{
+// Translates commands of type CArithmetic
+func (c *Coder) WriteArithmetic(op string, err error) string{
 	switch op {
 		case "add":
-			return 	pop_into_D +
+			return 	goto_topmost_stack_val +
+							pop_into_D +
 							"M=M+D\n" +
-							decrement_SP
+							decrement_SP, nil
 		case "sub":
-			return 	pop_into_D +
+			return 	goto_topmost_stack_val +
+							pop_into_D +
 							"M=M-D\n" +
-							decrement_SP
+							decrement_SP, nil
 		case "gt":
-			return 	pop_into_D +
-							c.ComparisonBranch("gt")
+			return 	goto_topmost_stack_val +
+							pop_into_D +
+							c.writeCompResultToStack("gt"), nil
 		case "lt":
-			return 	pop_into_D +
-							c.ComparisonBranch("lt")
+			return 	goto_topmost_stack_val +
+							pop_into_D +
+							c.writeCompResultToStack("lt"), nil
 		case "eq":
-			return 	pop_into_D +
-							c.ComparisonBranch("eq")
-		// case "neg":
-		// case "and":
-		// case "or":
-		// case "not":
+			return 	goto_topmost_stack_val +
+							pop_into_D +
+							c.writeCompResultToStack("eq"), nil
+		case "neg":
+			return 	 +
+							"M=-M", nil
+		case "and":
+			return 	goto_topmost_stack_val +
+							pop_into_D +
+							"M=M&D\n" +
+							decrement_SP, nil
+		case "or":
+			return 	goto_topmost_stack_val +
+							pop_into_D +
+							"M=M|D\n" +
+							decrement_SP, nil
+		case "not":
+			return 	goto_topmost_stack_val +
+							"M=!M", nil
 	}
-	return ""
+	return "", errors.New("Command is not valid")
 }
 
 // Moves memory pointer to the specified segment address
