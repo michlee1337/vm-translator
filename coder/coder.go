@@ -5,7 +5,6 @@ package coder
 import (
 	"fmt"
 	"strings"
-	"errors"
 )
 
 // Map of segment pointers for the Hack machine spec.
@@ -105,48 +104,48 @@ func (c *Coder) WritePop(segment string, addr string) string {
 }
 
 // Translates commands of type CArithmetic
-func (c *Coder) WriteArithmetic(op string) (string, error) {
+func (c *Coder) WriteArithmetic(op string) string {
 	switch op {
 		case "add":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
 							"M=M+D\n" +
-							decrement_SP, nil
+							decrement_SP
 		case "sub":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
 							"M=M-D\n" +
-							decrement_SP, nil
+							decrement_SP
 		case "gt":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
-							c.writeCompResultToStack("gt"), nil
+							c.writeCompResultToStack("gt")
 		case "lt":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
-							c.writeCompResultToStack("lt"), nil
+							c.writeCompResultToStack("lt")
 		case "eq":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
-							c.writeCompResultToStack("eq"), nil
+							c.writeCompResultToStack("eq")
 		case "neg":
 			return 	goto_topmost_stack_val +
-							"M=-M\n", nil
+							"M=-M\n"
 		case "and":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
 							"M=M&D\n" +
-							decrement_SP, nil
+							decrement_SP
 		case "or":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
 							"M=M|D\n" +
-							decrement_SP, nil
+							decrement_SP
 		case "not":
 			return 	goto_topmost_stack_val +
-							"M=!M\n", nil
+							"M=!M\n"
 	}
-	return "", errors.New("Command is not valid")
+	panic("Command is not valid")
 }
 
 // Writes end of ASM files

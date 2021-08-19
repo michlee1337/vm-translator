@@ -31,17 +31,11 @@ func main() {
 	for p.Advance() {
 		switch p.CommandType() {
 			case parser.CPush:
-				arg1, _ := p.Arg1()
-				arg2, _ := p.Arg2()
-				outfile.WriteString(c.WritePush(arg1, arg2))
+				outfile.WriteString(c.WritePush(p.Arg1(), p.Arg2()))
 			case parser.CPop:
-				arg1, _ := p.Arg1()
-				arg2, _ := p.Arg2()
-				outfile.WriteString(c.WritePop(arg1, arg2))
+				outfile.WriteString(c.WritePop(p.Arg1(), p.Arg2()))
 			case parser.CArithmetic:
-				arg1, _ := p.Arg1()
-				outfile.WriteString(c.WriteArithmetic(arg1));
-
+				outfile.WriteString(c.WriteArithmetic(p.Arg1()));
 		}
 	}
 }

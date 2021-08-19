@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"errors"
 )
 
 // Command Types in VM Language
@@ -71,26 +70,26 @@ func (p *Parser) CommandType() (CommandType) {
 
 // Returns the first argument of the current command.
 // If no such argument exists, returns error.
-func (p *Parser) Arg1() (string, error) {
+func (p *Parser) Arg1() string {
 	if p.cur_line == "" {
-		return "", errors.New("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
+		panic("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
 	}
 	cmd_type := p.CommandType()
 	if cmd_type == CReturn {
-		return "", errors.New("Commands of type Return has no arguments")
+		panic("Commands of type Return has no arguments")
 	}
 	if cmd_type == CArithmetic {
-		return strings.Fields(p.cur_line)[0], nil
+		return strings.Fields(p.cur_line)[0]
 	}
-	return strings.Fields(p.cur_line)[1], nil
+	return strings.Fields(p.cur_line)[1]
 }
 
 
 // Returns the second argument of the current command.
 // If no such argument exists, returns error.
-func (p *Parser) Arg2() (string, error) {
+func (p *Parser) Arg2() string {
 	if p.cur_line == "" {
-		return "", errors.New("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
+		panic("Parser has not yet started processing the file. Call parser.Advance() to start processing.")
 	}
 	cmd_type := p.CommandType()
 
@@ -98,9 +97,9 @@ func (p *Parser) Arg2() (string, error) {
 			cmd_type != CPop &&
 			cmd_type != CFunction &&
 			cmd_type != CCall {
-		return "", fmt.Errorf("Command of type %v has no second argument.", cmd_type)
+		panic(fmt.Sprintf("Command of type %v has no second argument.", cmd_type))
 	}
-	return strings.Fields(p.cur_line)[2], nil
+	return strings.Fields(p.cur_line)[2]
 }
 
 // Returns true if the current command is not whitespace and not a comment.
