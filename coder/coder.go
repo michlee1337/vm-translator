@@ -144,10 +144,18 @@ func (c *Coder) WriteArithmetic(op string) (string, error) {
 							decrement_SP, nil
 		case "not":
 			return 	goto_topmost_stack_val +
-							"M=!M", nil
+							"M=!M\n", nil
 	}
 	return "", errors.New("Command is not valid")
 }
+
+// Writes end of ASM files
+func (c *Coder) WriteClose() string {
+	return 	"(END)\n" +
+					"@END\n" +
+					"0; JMP\n"
+}
+
 
 // Moves memory pointer to the specified segment address
 func (c *Coder) getSegment(segment string, addr string) string {
