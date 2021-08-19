@@ -34,15 +34,15 @@ var label_count = map[string]int{
 	"LT": 0,
 	"EQ": 0}
 
-// Common sub-operation in arithmetic commands
+// Common sub-operation
 const goto_topmost_stack_val = 	"@SP\n" +
 															"A=M-1\n"
 
-// Common sub-operation in arithmetic commands
+// Common sub-operation
 const pop_into_D = 	"D=M\n" + 	 	// store val in D
 										"A=A-1\n"   	// move to second top-most
 
-// Common sub-operation in arithmetic commands
+// Common sub-operation
 const decrement_SP = 	"@SP\n" +
 											"M=M-1\n"
 
