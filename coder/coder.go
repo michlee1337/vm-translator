@@ -5,6 +5,7 @@ package coder
 import (
 	"fmt"
 	"strings"
+	"errors"
 )
 
 // Map of segment pointers for the Hack machine spec.
@@ -104,7 +105,7 @@ func (c *Coder) WritePop(segment string, addr string) string {
 }
 
 // Translates commands of type CArithmetic
-func (c *Coder) WriteArithmetic(op string, err error) string{
+func (c *Coder) WriteArithmetic(op string) (string, error) {
 	switch op {
 		case "add":
 			return 	goto_topmost_stack_val +
@@ -129,7 +130,7 @@ func (c *Coder) WriteArithmetic(op string, err error) string{
 							pop_into_D +
 							c.writeCompResultToStack("eq"), nil
 		case "neg":
-			return 	 +
+			return 	goto_topmost_stack_val +
 							"M=-M", nil
 		case "and":
 			return 	goto_topmost_stack_val +
