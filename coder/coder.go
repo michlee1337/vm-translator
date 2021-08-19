@@ -15,8 +15,6 @@ var segment_ptr = map[string]string{
 	"argument"	: "ARG",
 	"this"			: "THIS",
 	"that"			: "THAT",
-	"constant"	: "0",
-	"temp"			: "5",
 	"pointer"		: "3"}
 
 // Map of VM comparators to their negated Assembly jump commands.
@@ -60,15 +58,26 @@ func New(file_name string) *Coder {
 // Translates commands of type CPush
 func (c *Coder) WritePush(segment string, addr string) string {
 	var sb strings.Builder
+	if segment == "constant" {
+		// constant is not a segment in storage space.
+		// Instead it refers to the actual integer value.
+		sb.WriteString(
+			"@" + addr + "\n" +
+			"D=A\n" +
+			"@SP\n" +
+			"A=M\n" +
+			"M=D\n")
+	} else {
+		// move to segment
+		sb.WriteString(c.getSegment(segment, addr))
 
-	// move to segment
-	sb.WriteString(c.getSegment(segment, addr))
-
-	// copy value from segment into stack
-	sb.WriteString(
-		"D=M\n" +
-		"@SP\n" +
-		"M=D\n")
+		// copy value from segment into stack
+		sb.WriteString(
+			"D=M\n" +
+			"@SP\n" +
+			"A=M\n" +
+			"M=D\n")
+	}
 
 	// increment stack pointer
 	sb.WriteString(
@@ -81,24 +90,25 @@ func (c *Coder) WritePush(segment string, addr string) string {
 // Translates commands of type CPop
 func (c *Coder) WritePop(segment string, addr string) string {
 	var sb strings.Builder
-
-	// move to stack and store data
+	// save segment location
 	sb.WriteString(
-		"@SP\n" +
-		"A=M\n" +
-		"D=M\n")
+		c.getSegment(segment, addr) +
+		"D=A\n" +
+		"@R13\n" +
+		"M=D\n")
 
-	// move to segment
-	sb.WriteString(c.getSegment(segment, addr))
-
+	// move to stack
+	sb.WriteString(goto_topmost_stack_val)
+	
 	// copy data into segment
 	sb.WriteString(
+		"D=M\n" +
+		"@R13\n" +
+		"A=M\n" +
 		"M=D\n")
 
 	// decrement stack pointer
-	sb.WriteString(
-		"@SP\n" +
-		"M=M-1\n")
+	sb.WriteString(decrement_SP)
 
 	return sb.String()
 }
@@ -162,11 +172,25 @@ func (c *Coder) getSegment(segment string, addr string) string {
 	if segment == "static" {
 		return fmt.Sprintf("@%v.%v\n", c.file_name, addr)
 	}
+	var sb strings.Builder
 
-	return "@" + segment_ptr[segment] + "\n" +
-					"D=A\n" +
-					"@" + addr + "\n" +
-					"A=D+A\n"
+	// D = addr
+	sb.WriteString(
+		"@" + addr + "\n" +
+		"D=A\n")
+
+	// increment by segment start location
+	if segment == "temp" {
+		sb.WriteString(
+			"@R5\n" +
+			"A=D+A\n")
+	} else {
+		sb.WriteString(
+			"@" + segment_ptr[segment] + "\n" +
+			"A=D+M\n")
+	}
+
+	return 	sb.String()
 }
 
 // Writes boolean result of comparison to the stack
