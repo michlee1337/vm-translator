@@ -38,4 +38,7 @@ func main() {
 				outfile.WriteString(c.WriteArithmetic(p.Arg1()));
 		}
 	}
+
+	outfile.WriteString(c.WriteClose());
+	fmt.Println("Translated successfully! New file written at ", outfile.Name())
 }
