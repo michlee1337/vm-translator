@@ -155,7 +155,7 @@ func (c *Coder) WriteArithmetic(op string) string {
 			return 	goto_topmost_stack_val +
 							"M=!M\n"
 	}
-	panic("Command is not valid")
+	panic(fmt.Sprintf("Command is not valid: ", op))
 }
 
 // Writes end of ASM files
