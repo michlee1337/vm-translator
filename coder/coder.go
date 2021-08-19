@@ -198,22 +198,22 @@ func (c *Coder) getSegment(segment string, addr string) string {
 func (c *Coder) writeCompResultToStack(comparator string) string {
 	label := fmt.Sprintf("NOT_%v%d", comparator, label_count[comparator])
 	cond := cmp_false[comparator]
-	return	"D=M-D\n" + 					// D = second topmost val - topmost val
+	return	"D=M-D\n" + 						// D = second topmost val - topmost val
 					"@SP\n" +  						
-					"M=M+1" + 						// preemptively increment stack pointer 
+					"M=M+1" + 							// preemptively increment stack pointer 
 					"A=M-1\n" +							// goto top of stack
 
-					"@" + label + "\n" +  // jump if comparator result is false
+					"@" + label + "\n" +  	// jump if comparator result is false
 					"D;" + cond +"\n" +
 
-					"M=-1\n" +  // if true, write -1 and end
+					"M=-1\n" +  						// if true, write -1 and end
 					"@END\n" +
 					"0; JMP\n" +
 
 					"(" + label + ")\n" +  // if false, write 0 and end
 					"M=0\n" +
 
-					"(END)\n" +  // loop infinitely
+					"(END)\n" +  					// loop infinitely
 					"@END\n" +
 					"0; JMP\n"
 } 
