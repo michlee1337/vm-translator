@@ -18,7 +18,7 @@ func main() {
 		panic("failed to open file")
 	}
 
-	file_name := os.Args[1][:strings.Index(os.Args[1], ".")]
+	file_name := os.Args[1][:strings.Index(os.Args[1], ".vm")]
 	outfile, err := os.Create(fmt.Sprintf("%v.asm", file_name))
 	if err != nil {
 		panic("failed to create file")
