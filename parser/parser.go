@@ -104,5 +104,5 @@ func (p *Parser) Arg2() string {
 
 // Returns true if the current command is not whitespace and not a comment.
 func (p *Parser) isCommand() bool {
-	return len(p.cur_line) > 1 && p.cur_line[:1] != "//"
+	return len(p.cur_line) > 1 && p.cur_line[:2] != "//"
 }
