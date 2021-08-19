@@ -47,7 +47,7 @@ const pop_into_D = 	"D=M\n" + 	 	// store val in D
 
 // Common sub-operation in arithmetic commands
 const decrement_SP = 	"@SP\n" +
-											"M=M-1"
+											"M=M-1\n"
 
 // Coder implements translation from VM Language to Assembly Language.
 type Coder struct {
@@ -131,7 +131,7 @@ func (c *Coder) WriteArithmetic(op string) (string, error) {
 							c.writeCompResultToStack("eq"), nil
 		case "neg":
 			return 	goto_topmost_stack_val +
-							"M=-M", nil
+							"M=-M\n", nil
 		case "and":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
