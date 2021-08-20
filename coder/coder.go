@@ -129,15 +129,18 @@ func (c *Coder) WriteArithmetic(op string) string {
 		case "gt":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
-							c.writeCompResultToStack("gt")
+							c.writeCompResultToStack("gt") +
+							decrement_SP
 		case "lt":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
-							c.writeCompResultToStack("lt")
+							c.writeCompResultToStack("lt") +
+							decrement_SP
 		case "eq":
 			return 	goto_topmost_stack_val +
 							pop_into_D +
-							c.writeCompResultToStack("eq")
+							c.writeCompResultToStack("eq") +
+							decrement_SP
 		case "neg":
 			return 	goto_topmost_stack_val +
 							"M=-M\n"
@@ -200,7 +203,6 @@ func (c *Coder) writeCompResultToStack(comparator string) string {
 	cond := cmp_false[comparator]
 	return	"D=M-D\n" + 						// D = second topmost val - topmost val
 					"@SP\n" +  						
-					"M=M+1" + 							// preemptively increment stack pointer 
 					"A=M-1\n" +							// goto top of stack
 
 					"@" + label + "\n" +  	// jump if comparator result is false
