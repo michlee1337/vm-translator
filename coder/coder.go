@@ -199,23 +199,23 @@ func (c *Coder) getSegment(segment string, addr string) string {
 // Writes boolean result of comparison to the stack
 // true is respresented as -1 (0b111...111), false as 0 (0b000...000)
 func (c *Coder) writeCompResultToStack(comparator string) string {
-	label := fmt.Sprintf("NOT_%v%d", comparator, label_count[comparator])
+	jump := fmt.Sprintf("NOT_%v%d", comparator, label_count[comparator])
+	end := fmt.Sprintf("END_%v%d", comparator, label_count[comparator])
+	label_count[comparator] += 1  // increment counter to ensure label uniqueness
 	cond := cmp_false[comparator]
 	return	"D=M-D\n" + 						// D = second topmost val - topmost val
 					"@SP\n" +  						
 					"A=M-1\n" +							// goto top of stack
 
-					"@" + label + "\n" +  	// jump if comparator result is false
+					"@" + jump + "\n" +  		// jump if comparator result is false
 					"D;" + cond +"\n" +
 
 					"M=-1\n" +  						// if true, write -1 and end
-					"@END\n" +
+					"@" + end + "\n" +
 					"0; JMP\n" +
 
-					"(" + label + ")\n" +  // if false, write 0 and end
+					"(" + jump + ")\n" +  	// if false, write 0 and end
 					"M=0\n" +
 
-					"(END)\n" +  					// loop infinitely
-					"@END\n" +
-					"0; JMP\n"
+					"(" + end + ")\n"
 } 
