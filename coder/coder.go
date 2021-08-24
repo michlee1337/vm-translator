@@ -234,17 +234,21 @@ func (c *Coder) writeCompResultToStack(comparator string) string {
 	label_count[comparator] += 1  // increment counter to ensure label uniqueness
 	cond := cmp_false[comparator]
 	return	"D=M-D\n" + 						// D = second topmost val - topmost val
-					"@SP\n" +  						
-					"A=M-1\n" +							// goto top of stack
 
 					"@" + jump + "\n" +  		// jump if comparator result is false
 					"D;" + cond +"\n" +
 
-					"M=-1\n" +  						// if true, write -1 and end
+					"@SP\n" +  							// if true, write -1 and end
+					"A=M-1\n" +
+					"A=A-1\n" +
+					"M=-1\n" +
 					"@" + end + "\n" +
 					"0; JMP\n" +
 
 					"(" + jump + ")\n" +  	// if false, write 0 and end
+					"@SP\n" +
+					"A=M-1\n" +
+					"A=A-1\n" +
 					"M=0\n" +
 
 					"(" + end + ")\n"
