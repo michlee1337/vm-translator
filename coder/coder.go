@@ -49,15 +49,22 @@ const decrement_SP = 	"@SP\n" +
 // Coder implements translation from VM Language to Assembly Language.
 type Coder struct {
 	file_name string  // necessary for handling static segment commands
+	debug bool 				// if true, generates .asm code that is more readable
 }
 
-func New(file_name string) *Coder {
-	return &Coder{file_name}
+func New(file_name string, debug bool) *Coder {
+	return &Coder{file_name, debug}
 }
 
 // Translates commands of type CPush
 func (c *Coder) WritePush(segment string, addr string) string {
 	var sb strings.Builder
+
+	if c.debug {
+		sb.WriteString(
+			"\n// push " + segment + addr + "\n")
+	}
+
 	if segment == "constant" {
 		// constant is not a segment in storage space.
 		// Instead it refers to the actual integer value.
@@ -83,13 +90,19 @@ func (c *Coder) WritePush(segment string, addr string) string {
 	sb.WriteString(
 		"@SP\n" +
 		"M=M+1\n")
-
+	
 	return sb.String()
 }
 
 // Translates commands of type CPop
 func (c *Coder) WritePop(segment string, addr string) string {
 	var sb strings.Builder
+
+	if c.debug {
+		sb.WriteString(
+			"\n// pop " + segment + addr + "\n")
+	}
+
 	// save segment location
 	sb.WriteString(
 		c.getSegment(segment, addr) +
@@ -115,50 +128,67 @@ func (c *Coder) WritePop(segment string, addr string) string {
 
 // Translates commands of type CArithmetic
 func (c *Coder) WriteArithmetic(op string) string {
+	var sb strings.Builder
+
+	if c.debug {
+		sb.WriteString(
+			"\n// " + op + "\n")
+	}
 	switch op {
 		case "add":
-			return 	goto_topmost_stack_val +
-							pop_into_D +
-							"M=M+D\n" +
-							decrement_SP
+			sb.WriteString(
+				goto_topmost_stack_val +
+				pop_into_D +
+				"M=M+D\n" +
+				decrement_SP)
 		case "sub":
-			return 	goto_topmost_stack_val +
-							pop_into_D +
-							"M=M-D\n" +
-							decrement_SP
+			sb.WriteString(
+				goto_topmost_stack_val +
+				pop_into_D +
+				"M=M-D\n" +
+				decrement_SP)
 		case "gt":
-			return 	goto_topmost_stack_val +
-							pop_into_D +
-							c.writeCompResultToStack("gt") +
-							decrement_SP
+			sb.WriteString(
+				goto_topmost_stack_val +
+				pop_into_D +
+				c.writeCompResultToStack("gt") +
+				decrement_SP)
 		case "lt":
-			return 	goto_topmost_stack_val +
-							pop_into_D +
-							c.writeCompResultToStack("lt") +
-							decrement_SP
+			sb.WriteString(
+				goto_topmost_stack_val +
+				pop_into_D +
+				c.writeCompResultToStack("lt") +
+				decrement_SP)
 		case "eq":
-			return 	goto_topmost_stack_val +
-							pop_into_D +
-							c.writeCompResultToStack("eq") +
-							decrement_SP
+			sb.WriteString(
+				goto_topmost_stack_val +
+				pop_into_D +
+				c.writeCompResultToStack("eq") +
+				decrement_SP)
 		case "neg":
-			return 	goto_topmost_stack_val +
-							"M=-M\n"
+			sb.WriteString(
+				goto_topmost_stack_val +
+				"M=-M\n")
 		case "and":
-			return 	goto_topmost_stack_val +
-							pop_into_D +
-							"M=M&D\n" +
-							decrement_SP
+			sb.WriteString(
+				goto_topmost_stack_val +
+				pop_into_D +
+				"M=M&D\n" +
+				decrement_SP)
 		case "or":
-			return 	goto_topmost_stack_val +
-							pop_into_D +
-							"M=M|D\n" +
-							decrement_SP
+			sb.WriteString(
+				goto_topmost_stack_val +
+				pop_into_D +
+				"M=M|D\n" +
+				decrement_SP)
 		case "not":
-			return 	goto_topmost_stack_val +
-							"M=!M\n"
+			sb.WriteString(
+				goto_topmost_stack_val +
+				"M=!M\n")
+		default:
+			panic(fmt.Sprintf("Command is not valid: ", op))
 	}
-	panic(fmt.Sprintf("Command is not valid: ", op))
+	return sb.String()
 }
 
 // Writes end of ASM files
