@@ -30,7 +30,7 @@ func main() {
 	defer outfile.Close()
 
 	p := parser.New(infile)
-	c := coder.New(file, *debugPtr)
+	c := coder.New(file[strings.LastIndex(file, "/")+1:], *debugPtr)
 	
 	if *debugPtr {
 		outfile.WriteString("// This file was generated in debug mode\n")
