@@ -21,18 +21,18 @@ var segment_ptr = map[string]string{
 // This is used to implement branching to translate comparator 
 // arithmetic commands.
 var cmp_false = map[string]string{
-	"GT": "JLE",  // greater than == not less than or equal to
-	"LT": "JGE",  // less than == not greater than or equal to
-	"EQ": "JNE"}  // equal == not not equal
+	"gt": "JLE",  // greater than == not less than or equal to
+	"lt": "JGE",  // less than == not greater than or equal to
+	"eq": "JNE"}  // equal == not not equal
 		
 // Map of number of times this particular VM comparator has
 // appeared in the current instream being translated.
 // This is used to create unique branch labels to translate
 // comparator arithmetic commands.
 var label_count = map[string]int{
-	"GT": 0,
-	"LT": 0,
-	"EQ": 0}
+	"gt": 0,
+	"lt": 0,
+	"eq": 0}
 
 // Common sub-operation
 const goto_topmost_stack_val = 	"@SP\n" +
