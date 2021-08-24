@@ -15,7 +15,8 @@ var segment_ptr = map[string]string{
 	"argument"	: "ARG",
 	"this"			: "THIS",
 	"that"			: "THAT",
-	"pointer"		: "3"}
+	"temp"			: "R5",
+	"pointer"		: "R3"}
 
 // Map of VM comparators to their negated Assembly jump commands.
 // This is used to implement branching to translate comparator 
@@ -213,9 +214,9 @@ func (c *Coder) getSegment(segment string, addr string) string {
 		"D=A\n")
 
 	// increment by segment start location
-	if segment == "temp" {
+	if segment == "temp" || segment == "pointer" {
 		sb.WriteString(
-			"@R5\n" +
+			"@" + segment_ptr[segment] + "\n" +
 			"A=D+A\n")
 	} else {
 		sb.WriteString(
