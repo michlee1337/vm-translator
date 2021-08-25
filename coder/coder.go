@@ -187,7 +187,7 @@ func (c *Coder) WriteArithmetic(op string) string {
 				goto_topmost_stack_val +
 				"M=!M\n")
 		default:
-			panic(fmt.Sprintf("Command is not valid: ", op))
+			panic(fmt.Sprintf("Command %s is not valid", op))
 	}
 	return sb.String()
 }
