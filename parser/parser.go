@@ -16,13 +16,14 @@ const (
 	CArithmetic CommandType = iota
   CPush
   CPop
+	CLabel
   CGoto
 	CIf
 	CFunction
 	CReturn
 	CCall
 )
-
+ 
 // Parser tracks the current line of vm file being processed,
 // parses the types and arguments of the current command,
 // and advances to the next command.
@@ -63,7 +64,19 @@ func (p *Parser) CommandType() (CommandType) {
 		return CPush
 	} else if first_word == "pop" {
 		return CPop
-	} else {  // TODO: Handle other commands
+	} else if first_word == "label" {
+		return CLabel
+	} else if first_word == "goto" {
+		return CGoto
+	} else if first_word == "if-goto" {
+		return CIf
+	} else if first_word == "function" {
+		return CFunction
+	} else if first_word == "return" {
+		return CReturn
+	} else if first_word == "call" {
+		return CCall
+	} else {
 		return CArithmetic
 	}
 }
