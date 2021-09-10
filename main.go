@@ -42,7 +42,13 @@ func main() {
 			case parser.CPop:
 				outfile.WriteString(c.WritePop(p.Arg1(), p.Arg2()))
 			case parser.CArithmetic:
-				outfile.WriteString(c.WriteArithmetic(p.Arg1()));
+				outfile.WriteString(c.WriteArithmetic(p.Arg1()))
+			case parser.CLabel:
+				outfile.WriteString(c.WriteLabel(p.Arg1()))
+			case parser.CGoto:
+				outfile.WriteString(c.WriteGoto(p.Arg1()))
+			case parser.CIf:
+				outfile.WriteString(c.WriteIf(p.Arg1()))
 		}
 	}
 

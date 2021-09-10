@@ -192,6 +192,65 @@ func (c *Coder) WriteArithmetic(op string) string {
 	return sb.String()
 }
 
+// Translates commands of type CLabel
+func (c *Coder) WriteLabel(dest string) string {
+	var sb strings.Builder
+
+	if c.debug {
+		sb.WriteString(
+			"\n// label " + dest + "\n")
+	}
+
+	sb.WriteString("(" + dest + ")\n")
+
+	return sb.String()
+}
+
+// Translates commands of type CGoto
+func (c *Coder) WriteGoto(dest string) string {
+	var sb strings.Builder
+
+	if c.debug {
+		sb.WriteString(
+			"\n// goto " + dest + "\n")
+	}
+
+	sb.WriteString(
+		"@" + dest + "\n" +
+		"0; JMP")
+
+	return sb.String()
+}
+
+// Translates commands of type CIf
+func (c *Coder) WriteIf(dest string) string {
+	var sb strings.Builder
+
+	if c.debug {
+		sb.WriteString(
+			"\n// if " + dest + "\n")
+	}
+
+	sb.WriteString(
+		goto_topmost_stack_val +  // D = stack pop
+		pop_into_D +
+		decrement_SP +
+		"@" + dest + "\n" +  			// if D: jump
+		"D; JNE\n")
+
+	return sb.String()
+}
+
+// // Translates commands of type CFunction
+// func (c *Coder) WriteFunction() string {}
+
+// // Translates commands of type CCall
+// func (c *Coder) WriteCall() string {}
+
+// // Translates commands of type CReturn
+// func (c *Coder) WriteReturn() string {}
+
+
 // Writes end of ASM files
 func (c *Coder) WriteClose() string {
 	return 	"(END)\n" +
